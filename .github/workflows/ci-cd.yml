@@ -17,11 +17,11 @@ jobs:
       SERVICE_NAME: strapi-service
 
     steps:
-      # 1. Checkout code
-      - name: Checkout
+      #  Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configure AWS credentials
+      #  Configure AWS credentials
       - name: AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -29,19 +29,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3. Login to ECR
+      #  Login to ECR
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      # 4. Build and push Docker image
-      - name: Build and Push Docker
+      # Build and push Docker image
+      - name: Build and Push Docker image
         run: |
           IMAGE_TAG=${GITHUB_SHA::8}
+          echo "Building Docker image with tag $IMAGE_TAG"
           docker build -t $ECR_REPO_NAME:$IMAGE_TAG ./strapi
           docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
 
-      # 5. Update ECS service
+      #  Update ECS service with new image
       - name: Deploy ECS service
         run: |
           IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${GITHUB_SHA::8}
@@ -51,10 +52,11 @@ jobs:
             --force-new-deployment \
             --region $AWS_REGION
 
-      # 6. Terraform apply for infra changes
+      #  Terraform setup
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      # Terraform Init & Apply
       - name: Terraform Init & Apply
         run: |
           cd terraform
