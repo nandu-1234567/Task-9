@@ -29,20 +29,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      #  Login to ECR
+      # Login to ECR
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      # Build and push Docker image
+      # Build and push Docker image (path updated to strapi-app)
       - name: Build and Push Docker image
         run: |
           IMAGE_TAG=${GITHUB_SHA::8}
-          echo "Building Docker image with tag $IMAGE_TAG"
-          docker build -t $ECR_REPO_NAME:$IMAGE_TAG ./strapi
+          echo "Building Docker image with tag $IMAGE_TAG from strapi-app/"
+          docker build -t $ECR_REPO_NAME:$IMAGE_TAG ./strapi-app
           docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
 
-      #  Update ECS service with new image
+      # Update ECS service
       - name: Deploy ECS service
         run: |
           IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${GITHUB_SHA::8}
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # Terraform Init & Apply
+      #  Terraform Init & Apply
       - name: Terraform Init & Apply
         run: |
           cd terraform
