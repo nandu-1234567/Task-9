@@ -36,3 +36,7 @@ variable "app_keys" {}
 variable "api_token_salt" {}
 variable "admin_jwt_secret" {}
 variable "jwt_secret" {}
+variable "ecr_url" {
+  description = "The full URI of the Docker image in ECR (with tag)"
+  type        = string
+}
