@@ -41,7 +41,7 @@ jobs:
           aws ecr describe-repositories --repository-names $ECR_REPO_NAME || \
           aws ecr create-repository --repository-name $ECR_REPO_NAME
 
-          # Build Docker image from strapi-app/
+          # Build Docker image
           docker build -t $ECR_REPO_NAME:$IMAGE_TAG ./strapi-app
 
           # Tag and push
@@ -55,27 +55,46 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # 6️⃣ Terraform Init & Apply
-      - name: Terraform Apply
-        working-directory: ./terraform
+      # 6️⃣ Terraform Init
+      - name: Terraform Init
         run: |
+          cd terraform
           terraform init
-          terraform apply -auto-approve \
-           - name: Terraform Apply
-             run: |
-               terraform apply -auto-approve \
-                 -var "db_username=${{ secrets.DB_USERNAME }}" \
-                 -var "db_password=${{ secrets.DB_PASSWORD }}" \
-                 -var "db_name=${{ secrets.DB_NAME }}
-                 -var "app_keys=${{ secrets.APP_KEYS }}" \
-                 -var "api_token_salt=${{ secrets.API_TOKEN_SALT }}" \
-                 -var "admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
-                 -var "jwt_secret=${{ secrets.JWT_SECRET }}" \
-                 -var "execution_role_arn=${{ secrets.EXECUTION_ROLE_ARN }}" \
-                 -var "task_role_arn=${{ secrets.TASK_ROLE_ARN }}" \
-                 -var "ecr_url=${{ env.ECR_IMAGE_URI }}"
 
-      # 7️⃣ Output ECS service & ALB DNS
+      # 7️⃣ Terraform Plan (optional but recommended)
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan \
+            -var "db_username=${{ secrets.DB_USERNAME }}" \
+            -var "db_password=${{ secrets.DB_PASSWORD }}" \
+            -var "db_name=${{ secrets.DB_NAME }}" \
+            -var "app_keys=${{ secrets.APP_KEYS }}" \
+            -var "api_token_salt=${{ secrets.API_TOKEN_SALT }}" \
+            -var "admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
+            -var "jwt_secret=${{ secrets.JWT_SECRET }}" \
+            -var "execution_role_arn=${{ secrets.EXECUTION_ROLE_ARN }}" \
+            -var "task_role_arn=${{ secrets.TASK_ROLE_ARN }}" \
+            -var "ecr_url=${{ env.ECR_IMAGE_URI }}"
+
+      # 8️⃣ Terraform Apply
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve \
+            -var "db_username=${{ secrets.DB_USERNAME }}" \
+            -var "db_password=${{ secrets.DB_PASSWORD }}" \
+            -var "db_name=${{ secrets.DB_NAME }}" \
+            -var "app_keys=${{ secrets.APP_KEYS }}" \
+            -var "api_token_salt=${{ secrets.API_TOKEN_SALT }}" \
+            -var "admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
+            -var "jwt_secret=${{ secrets.JWT_SECRET }}" \
+            -var "execution_role_arn=${{ secrets.EXECUTION_ROLE_ARN }}" \
+            -var "task_role_arn=${{ secrets.TASK_ROLE_ARN }}" \
+            -var "ecr_url=${{ env.ECR_IMAGE_URI }}"
+
+      # 9️⃣ Output ECS service & ALB DNS
       - name: Show ALB DNS
-        working-directory: ./terraform
-        run: terraform output alb_dns
+        run: |
+          cd terraform
+          terraform output alb_dns
