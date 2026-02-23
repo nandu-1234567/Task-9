@@ -7,11 +7,12 @@ resource "aws_db_subnet_group" "mydb_subnet" {
 # RDS Instance
 ########################
 resource "aws_db_instance" "mydb" {
+  identifier = "strapi-db"
   allocated_storage      = 20
   engine                 = "postgres"
   engine_version         = "15.3"
   instance_class         = var.db_instance_class
-  db_name                   = var.db_name
+  db_name                 = var.db_name
   username               = var.db_username
   password               = var.db_password
   skip_final_snapshot    = true
