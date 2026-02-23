@@ -25,6 +25,7 @@ resource "aws_db_instance" "mydb" {
   db_instance_class = var.db_instance_class
   security_group_id = aws_security_group.rds_sg.id
 
-  subnets = data.aws_subnets.default.ids  
+  db_subnet_group_name   = aws_db_subnet_group.mydb_subnet.name
+}
 }
 }
