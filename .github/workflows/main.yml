@@ -56,23 +56,17 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      # 6️⃣ Terraform Init & Apply
-      - name: Terraform Init & Apply
-        run: |
-          cd terraform
-          terraform init
-          terraform apply -auto-approve \
-            -var "db_username=${{ secrets.DB_USERNAME }}" \
-            -var "db_password=${{ secrets.DB_PASSWORD }}" \
-            -var "db_name=${{ secrets.DB_NAME }}" \
-            -var "app_keys=${{ secrets.APP_KEYS }}" \
-            -var "api_token_salt=${{ secrets.API_TOKEN_SALT }}" \
-            -var "admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
-            -var "jwt_secret=${{ secrets.JWT_SECRET }}" \
-            -var "execution_role_arn=${{ secrets.EXECUTION_ROLE_ARN }}" \
-            -var "task_role_arn=${{ secrets.TASK_ROLE_ARN }}" \
-            -var "ecr_url=$ECR_IMAGE_URI"
-
+     terraform apply -auto-approve \
+      -var "db_username=${DB_USERNAME}" \
+      -var "db_password=${DB_PASSWORD}" \
+      -var "db_name=${DB_NAME}" \
+      -var "app_keys=${APP_KEYS}" \
+      -var "api_token_salt=${API_TOKEN_SALT}" \
+      -var "admin_jwt_secret=${ADMIN_JWT_SECRET}" \
+      -var "jwt_secret=${JWT_SECRET}" \
+      -var "execution_role_arn=${EXECUTION_ROLE_ARN}" \
+      -var "task_role_arn=${TASK_ROLE_ARN}" \
+      -var "ecr_url=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/strapi-repo:4387ccac"
       # 7️⃣ Output ECS service & ALB DNS
       - name: Show ALB DNS
         run: |
