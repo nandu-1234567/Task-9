@@ -38,6 +38,9 @@ jobs:
         run: |
           IMAGE_TAG=${GITHUB_SHA::8}
           echo "Building Docker image with tag $IMAGE_TAG from strapi-app/"
+          # Ensure ECR repo exists
+           aws ecr describe-repositories --repository-names $ECR_REPO_NAME || \
+           aws ecr create-repository --repository-name $ECR_REPO_NAME
           docker build -t $ECR_REPO_NAME:$IMAGE_TAG ./strapi-app
           docker tag $ECR_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$IMAGE_TAG
