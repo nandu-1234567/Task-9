@@ -16,5 +16,15 @@ resource "aws_db_instance" "mydb" {
   password               = var.db_password   # must not be empty
   skip_final_snapshot    = true
   vpc_security_group_ids = [var.security_group_id]
-  db_subnet_group_name   = aws_db_subnet_group.mydb_subnet.name
+  module "rds" {
+  source   = "./modules/rds"
+  project_name = var.project_name
+  db_name      = var.db_name
+  db_username  = var.db_username
+  db_password  = var.db_password
+  db_instance_class = var.db_instance_class
+  security_group_id = aws_security_group.rds_sg.id
+
+  subnets = data.aws_subnets.default.ids  
+}
 }
