@@ -5,7 +5,7 @@ module "rds" {
   db_username       = var.db_username
   db_password       = var.db_password
   db_instance_class = var.aws_db_instance_class
-  subnets           = data.aws_subnets.default.ids
+  subnet_ids = data.aws_subnets.default.ids
   security_group_id = aws_security_group.ecs_sg.id
 }
 
