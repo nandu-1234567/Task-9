@@ -1,31 +1,23 @@
-resource "aws_db_subnet_group" "mydb_subnet" {
-  name       = "${var.project_name}-db-subnet-group"
-  subnet_ids = var.subnets
+resource "aws_db_subnet_group" "this" {
+  name       = "strapi-db-subnet-group"
+  subnet_ids = var.subnet_ids
+
+  tags = {
+    Name = "strapi-db-subnet-group"
+  }
 }
 
-########################
-# RDS Instance
-########################
-resource "aws_db_instance" "mydb" {
-  allocated_storage      = 20
+resource "aws_db_instance" "this" {
+  identifier             = "strapi-db"
   engine                 = "postgres"
-  engine_version         = "15.3"
-  instance_class         = var.db_instance_class
+  engine_version         = "15"
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 20
   db_name                = var.db_name
-  username               = var.db_username   # must not be empty
-  password               = var.db_password   # must not be empty
+  username               = var.db_username
+  password               = var.db_password
   skip_final_snapshot    = true
+  publicly_accessible    = false
   vpc_security_group_ids = [var.security_group_id]
-  module "rds" {
-  source   = "./modules/rds"
-  project_name = var.project_name
-  db_name      = var.db_name
-  db_username  = var.db_username
-  db_password  = var.db_password
-  db_instance_class = var.db_instance_class
-  security_group_id = aws_security_group.rds_sg.id
-
-  db_subnet_group_name   = aws_db_subnet_group.mydb_subnet.name
-}
-}
+  db_subnet_group_name   = aws_db_subnet_group.this.name
 }
