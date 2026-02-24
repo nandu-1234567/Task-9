@@ -29,3 +29,7 @@ variable "security_group_id" {
   description = "Security group for RDS"
   type        = string
 }
+variable "subnet_ids" {
+  description = "List of subnet IDs for RDS"
+  type        = list(string)
+}
